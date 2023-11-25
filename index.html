@@ -6,21 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="./assets/esfera-fav.png" type="image/x-icon">
     <title>Rastreador de poder</title>
+    
 </head>
 
 <body>
     <h1>¡Bienvenido a tu Rastreador de Poder!</h1>
     <input type="text" placeholder="Ingrese el nombre del peleador" id="peleador">
     <button onclick="buscarGuerrero()">Buscar</button>
+    <button onclick="buscarGuerreroEnApi()">Buscar en Api</button>
     <br>
     <div id="tarjetaGuerrero"></div>
-
+    
     <br><br><br>
     <div> Agregar un Nuevo Guerrero: </div>
     <input type="text" placeholder="Ingrese nombre" id="nuevoNombre">
     <input type="number" placeholder="Ingrese poder" id="nuevoPoder">
     <button onclick="agregarPeleador()">Agregar Peleador</button>
     <script src="./main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>

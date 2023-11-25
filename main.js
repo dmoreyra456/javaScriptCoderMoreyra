@@ -21,7 +21,6 @@ function guerrerosDefault() {
             nombre: "Goku",
             poder: 8000
         })
-        console.log("Agregado Goku.");
     }
 
     if (!existeElGuerrero("Vegeta")) {
@@ -29,7 +28,6 @@ function guerrerosDefault() {
             nombre: "Vegeta",
             poder: 9000
         })
-        console.log("Agregado Vegeta.");
     }
 
     if (!existeElGuerrero("Piccoro")) {
@@ -37,7 +35,6 @@ function guerrerosDefault() {
             nombre: "Piccoro",
             poder: 6000
         })
-        console.log("Agregado Piccoro.");
     }
 
     localStorage.setItem("guerreros", JSON.stringify(guerreros));
@@ -52,7 +49,7 @@ function existeElGuerrero(nombre) {
 
 function buscarGuerrero() {
     var guerreros = getLocalGuerreros();
-    console.log("Búsqueda de guerreros: " + guerreros)
+    
     const peleador = document.getElementById("peleador");
     var peleadorElegido = {
         nombre: "Piccoro",
@@ -60,7 +57,7 @@ function buscarGuerrero() {
     };
     var existe = false;
     for (let index = 0; index < guerreros.length; index++) {
-        console.log(guerreros[index].nombre);
+        
         if (guerreros[index].nombre == peleador.value) {
             existe = true;
             peleadorElegido = guerreros[index];
@@ -68,21 +65,7 @@ function buscarGuerrero() {
         }
     }
 
-    var card = document.getElementById("tarjetaGuerrero");
-    if (existe) {
-        var newHtml = `
-        <div class = "tarjeta">
-            <h2>Guerrero</h2>
-            <div>Nombre: ${peleadorElegido.nombre} </div>
-            <div>Poder: ${peleadorElegido.poder} </div>
-        </div>
-        `;
-        card.innerHTML = newHtml;
-        console.log(card);
-
-    } else {
-        card.innerHTML = "No se encontró el guerrero querido Sayayin.";
-    }
+    mostrarPeleadorEnPantalla(peleadorElegido,existe);
 }
 
 function agregarPeleador() {
@@ -96,8 +79,17 @@ function agregarPeleador() {
     }
     if (!existeElGuerrero(nombrePeleador)) {
         guerreros.push(nuevoGuerrero);
+        Swal.fire({
+            title: "Bienvenido Gran Peleador!",
+            text: "Tu peleador ha sido agregado.",
+            icon: "success"
+          });
     } else {
-        alert("El guerrero ya existe.");
+        Swal.fire({
+            title: "Oh no...!",
+            text: "El guerrero ya existe.",
+            icon: "error"
+          });
     }
     localStorage.setItem("guerreros", JSON.stringify(guerreros));
 }
@@ -111,4 +103,64 @@ function getLocalGuerreros() {
     } else {
         return guerreros;
     }
+}
+
+async function buscarGuerreroEnApi(){
+    const peleador = document.getElementById("peleador").value;
+    await buscarGuerreroEnApiByName(peleador);
+}
+
+async function buscarGuerreroEnApiByName(nombre) {
+
+    try {
+        var myHeaders = new Headers();
+        var myInit = {
+            method: "GET",
+            headers: myHeaders,
+            mode: "cors",
+            cache: "default",
+        };
+
+        var url = `https://dragonball-api.com/api/characters?name=${nombre}`;
+        var request = new Request(url, myInit);
+
+        const response = await fetch(request);
+
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if(data.length > 0){
+         peleadorEncontrado = data[0];
+         mostrarPeleadorEnPantalla({
+            nombre: peleadorEncontrado.name,
+            poder: peleadorEncontrado.ki
+         },true)
+
+        }else{
+            mostrarPeleadorEnPantalla(null,false);
+        }
+
+    } catch (error) {
+        console.error("Error al buscar el guerrero:", error);
+    }
+}
+
+function mostrarPeleadorEnPantalla(peleadorElegido,encontrado){
+    var card = document.getElementById("tarjetaGuerrero");
+    var newHtml  = "";
+    if(encontrado){
+        newHtml = `
+            <div class = "tarjeta">
+            <h2>Guerrero</h2>
+            <div>Nombre: ${peleadorElegido.nombre} </div>
+            <div>Poder: ${peleadorElegido.poder} </div>
+            </div>
+            `;
+    }else{
+        newHtml = "No se encontró el guerrero."
+    }
+
+    card.innerHTML = newHtml;
 }
